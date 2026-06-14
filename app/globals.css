@@ -1,26 +1,60 @@
 @import "tailwindcss";
 
+/* Ripe — Sunlit Solarpunk, grown up. Tokens locked from DESIGN.md.
+   ink-soft & terracotta darkened from the v2 preview to pass WCAG AA for text. */
+@theme {
+  --color-bone: #f4efe4;
+  --color-bone-2: #eae3d3;
+  --color-card: #ffffff;
+  --color-ink: #23271f;
+  --color-ink-soft: #54574a; /* was #6e7165 — failed AA for normal text */
+  --color-green: #2e5e3a;
+  --color-green-deep: #1c3f27;
+  --color-terracotta: #a8553c; /* was #bb6a50 — darkened so it's legible as text */
+  --color-sage: #e3e9da;
+  --color-line: rgba(35, 39, 31, 0.12);
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  color-scheme: light;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bone);
+  color: var(--color-ink);
+  font-family: var(--font-dm-sans), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Fraunces for headlines — plain CSS so it resolves the next/font runtime var
+   (Tailwind v4 @theme can't resolve runtime CSS vars). */
+.font-display {
+  font-family: var(--font-fraunces), Georgia, "Times New Roman", serif;
+}
+
+/* Feed entrance — CSS keyframes so cards are visible without JS (never blank). */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rise-in {
+  animation: rise-in 0.6s cubic-bezier(0.22, 0.7, 0.2, 1) both;
+}
+
+/* Respect users who ask for less motion: neutralize animations + transitions. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
