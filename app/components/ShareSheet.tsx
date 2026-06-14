@@ -50,6 +50,7 @@ export function ShareSheet({
     const isFree = free || num === 0;
     const listing: Listing = {
       id: `you-${++counter}`,
+      type: "produce",
       grower: "You",
       initial: "Y",
       title: title.trim(),
