@@ -152,8 +152,8 @@ export function ContactSheet({
                 Request sent
               </h2>
               <p className="text-[13.5px] text-ink-soft">
-                {l.grower} will see your note and reply right here in Ripe. We kept your number
-                private until you both say yes.
+                {l.grower} will see your note and can reply right here in Ripe. Your contact
+                details stay private until you both agree to connect.
               </p>
               <button
                 onClick={onClose}

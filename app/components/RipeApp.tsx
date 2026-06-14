@@ -6,7 +6,7 @@ import { Feed } from "./Feed";
 import { ClaimSheet } from "./ClaimSheet";
 import { ShareSheet } from "./ShareSheet";
 import { ContactSheet } from "./ContactSheet";
-import type { Listing, ListingType } from "../lib/listings";
+import { BLOCK_TOTAL, type Listing, type ListingType } from "../lib/listings";
 
 const FILTERS: { key: "all" | ListingType; label: string }[] = [
   { key: "all", label: "All" },
@@ -15,6 +15,15 @@ const FILTERS: { key: "all" | ListingType; label: string }[] = [
   { key: "tool", label: "Tools" },
   { key: "help", label: "Help" },
 ];
+
+// Section label reacts to the filter so the commons (the 2nd pillar) is legible.
+const SECTION: Record<"all" | ListingType, string> = {
+  all: "Near you",
+  produce: "Fresh near you",
+  land: "Land to grow",
+  tool: "Tools to borrow",
+  help: "Helping hands",
+};
 
 export function RipeApp({ listings }: { listings: Listing[] }) {
   const [items, setItems] = useState(listings);
@@ -42,21 +51,31 @@ export function RipeApp({ listings }: { listings: Listing[] }) {
 
   const shown = filter === "all" ? items : items.filter((l) => l.type === filter);
   const sheetOpen = Boolean(claiming) || Boolean(contacting) || sharing;
+  const moneyView = filter === "all" || filter === "produce";
 
   return (
     <div className="relative mx-auto min-h-dvh max-w-[440px] bg-bone">
       <main inert={sheetOpen ? true : undefined} className="flex flex-col">
         <header className="sticky top-0 z-10 bg-bone/85 px-5 pb-2 pt-4 backdrop-blur-md">
-          <div className="flex items-center justify-between">
-            <span className="font-display text-[25px] font-medium tracking-tight text-ink">
-              Ripe
-            </span>
-            <span className="flex items-center gap-1.5 text-[13px] font-semibold text-ink-soft">
+          <div className="flex items-start justify-between">
+            <div className="flex flex-col">
+              <span className="font-display text-[25px] font-medium leading-none tracking-tight text-ink">
+                Ripe
+              </span>
+              <span className="mt-1 text-[11px] font-semibold text-ink-soft">
+                Money goes straight to the grower
+              </span>
+            </div>
+            <span className="flex items-center gap-1.5 pt-1 text-[13px] font-semibold text-ink-soft">
               <span className="h-1.5 w-1.5 rounded-full bg-green" />
               Sunset District
             </span>
           </div>
-          <div className="mt-3 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none]">
+          <div
+            role="group"
+            aria-label="Filter listings by type"
+            className="mt-3 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none]"
+          >
             {FILTERS.map((f) => (
               <button
                 key={f.key}
@@ -76,10 +95,10 @@ export function RipeApp({ listings }: { listings: Listing[] }) {
 
         <div className="flex items-baseline justify-between px-5 pb-3.5 pt-3">
           <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-ink-soft">
-            Near you
+            {SECTION[filter]}
           </span>
-          <span className="text-[11px] font-semibold text-ink-soft">
-            {shown.length} within ½ mile
+          <span aria-live="polite" className="text-[11px] font-semibold text-ink-soft">
+            {moneyView ? `$${BLOCK_TOTAL} kept local this week` : `${shown.length} nearby`}
           </span>
         </div>
 

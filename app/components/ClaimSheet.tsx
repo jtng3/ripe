@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence, useReducedMotion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { QRCodeSVG } from "qrcode.react";
 import { BadgeCheck, X, ShieldCheck, MapPin, Lock, ArrowUpRight } from "lucide-react";
 import type { Listing } from "../lib/listings";
@@ -59,18 +59,26 @@ export function ClaimSheet({
 
   const num = Number(amount) || 0;
   const note = `Ripe · ${listing.grower}'s ${listing.title.replace(/^A |^Too many /i, "").toLowerCase()}`;
-  const neighborsFed = Math.max(1, Math.round(listing.weightLbs * 1.3));
 
-  function startClaim() {
+  // Hold reserves the item — fire only on real commitment (reaching pay),
+  // never on merely opening the sheet, so peeking a card doesn't drop its count.
+  function commitHold() {
     if (!held) {
       onHold(listing.id);
       setHeld(true);
     }
-    setStep(alreadyVerified ? "pay" : "verify");
   }
-
+  function startClaim() {
+    if (alreadyVerified) {
+      commitHold();
+      setStep("pay");
+    } else {
+      setStep("verify");
+    }
+  }
   function finishVerify() {
     onVerified();
+    commitHold();
     setStep("pay");
   }
 
@@ -186,7 +194,6 @@ export function ClaimSheet({
               headingRef={headingRef}
               num={num}
               paidVia={paidVia}
-              neighborsFed={neighborsFed}
               reduce={!!reduce}
               onDone={onClose}
             />
@@ -275,11 +282,11 @@ function DetailStep({
           onClick={onClaim}
           className="min-h-[52px] rounded-[13px] bg-green px-6 text-[15px] font-semibold text-white transition-transform duration-150 hover:-translate-y-px hover:bg-green-deep"
         >
-          Claim — hold 1 hour
+          Claim it
         </button>
       </div>
       <p className="text-center text-[12px] text-ink-soft">
-        Free to hold. We reserve it for you for 1 hour — no payment yet.
+        Free to hold for an hour — no payment until pickup.
       </p>
     </div>
   );
@@ -307,10 +314,9 @@ function VerifyStep({
   onDone: () => void;
 }) {
   function onCode(v: string) {
-    const digits = v.replace(/\D/g, "").slice(0, 6);
-    setCode(digits);
-    if (digits.length === 6) setTimeout(onDone, 350); // auto-advance
+    setCode(v.replace(/\D/g, "").slice(0, 6));
   }
+  const phoneOk = phone.replace(/\D/g, "").length >= 10;
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-2">
@@ -325,10 +331,10 @@ function VerifyStep({
         </h2>
       </div>
       <p className="text-[13.5px] text-ink-soft">
-        Ripe is neighbors-only. Confirming a real number keeps out throwaway
-        accounts and ties every claim to your ratings — so neighbors stay
-        accountable. {grower} confirmed theirs, too. We never share your number,
-        and never post for you.
+        Ripe is neighbors-only — a real number keeps it that way. It&rsquo;s how
+        you&rsquo;ll reach each other at the handoff, and it keeps everyone
+        accountable. {grower} confirmed theirs, too. We don&rsquo;t share your
+        number or sell your data.
       </p>
 
       {!codeSent ? (
@@ -347,7 +353,8 @@ function VerifyStep({
           </label>
           <button
             onClick={() => setCodeSent(true)}
-            className="min-h-[52px] rounded-[13px] bg-green text-[15px] font-semibold text-white transition-transform duration-150 hover:-translate-y-px hover:bg-green-deep"
+            disabled={!phoneOk}
+            className="min-h-[52px] rounded-[13px] bg-green text-[15px] font-semibold text-white transition-transform duration-150 hover:-translate-y-px hover:bg-green-deep disabled:opacity-40 disabled:hover:translate-y-0"
           >
             Text me a code
           </button>
@@ -372,8 +379,8 @@ function VerifyStep({
           </label>
           <button
             onClick={onDone}
-            disabled={code.length < 4}
-            className="min-h-[52px] rounded-[13px] bg-green text-[15px] font-semibold text-white transition-transform duration-150 hover:-translate-y-px hover:bg-green-deep disabled:opacity-40"
+            disabled={code.length < 6}
+            className="min-h-[52px] rounded-[13px] bg-green text-[15px] font-semibold text-white transition-transform duration-150 hover:-translate-y-px hover:bg-green-deep disabled:opacity-40 disabled:hover:translate-y-0"
           >
             Verify
           </button>
@@ -405,6 +412,7 @@ function PayStep({
   onPayNow: (via: "venmo" | "cashapp" | "paypal") => void;
 }) {
   const bump = (d: number) => setAmount(String(Math.max(0, num + d)));
+  const hasHandle = Boolean(l.handles.venmo || l.handles.cashapp || l.handles.paypal);
   return (
     <div className="flex flex-col gap-4">
       {/* reveal */}
@@ -426,7 +434,8 @@ function PayStep({
           {l.exactPickup}
         </h2>
         <p className="mt-1 text-[12px] text-ink-soft">
-          You both confirmed a real number. {l.grower} has been notified.
+          This claim is tied to your verified number and rating — no-shows hurt
+          your standing, so neighbors show up.
         </p>
       </motion.div>
 
@@ -460,10 +469,11 @@ function PayStep({
         )}
       </div>
 
-      {/* equitable ledger — the tiebreaker, made visible */}
-      <div className="flex items-center justify-center gap-1.5 rounded-[12px] bg-bone-2/70 py-2.5 text-[13px] font-semibold text-ink">
-        You pay ${num} → {l.grower} gets ${num}
-        <span className="text-terracotta">· Ripe takes $0</span>
+      {/* equitable ledger — the tiebreaker, made visible (present-tense, no forever-pledge) */}
+      <div className="flex items-center justify-center rounded-[12px] bg-bone-2/70 px-3 py-2.5 text-center text-[13px] font-semibold text-ink">
+        {num > 0
+          ? `You pay $${num} → ${l.grower} gets all $${num}. Ripe takes $0.`
+          : `Free, straight from ${l.grower}. Ripe takes $0.`}
       </div>
 
       {/* primary = pay at pickup (default) */}
@@ -477,28 +487,30 @@ function PayStep({
         Most neighbors pay at pickup, after they see the produce.
       </p>
 
-      {/* secondary = pay now */}
-      <div className="flex flex-col gap-2 border-t border-line pt-3">
-        <span className="text-center text-[11px] font-semibold uppercase tracking-[0.1em] text-ink-soft">
-          or pay now
-        </span>
-        <div className="flex flex-wrap justify-center gap-2">
-          {l.handles.venmo && (
-            <PayNowButton onClick={() => onPayNow("venmo")} primary>
-              Pay ${num} in Venmo <ArrowUpRight className="h-4 w-4" />
-            </PayNowButton>
-          )}
-          {l.handles.cashapp && (
-            <PayNowButton onClick={() => onPayNow("cashapp")}>Cash App</PayNowButton>
-          )}
-          {l.handles.paypal && (
-            <PayNowButton onClick={() => onPayNow("paypal")}>PayPal</PayNowButton>
-          )}
+      {/* secondary = pay now (only when the grower listed a handle) */}
+      {hasHandle && (
+        <div className="flex flex-col gap-2 border-t border-line pt-3">
+          <span className="text-center text-[11px] font-semibold uppercase tracking-[0.1em] text-ink-soft">
+            or pay now
+          </span>
+          <div className="flex flex-wrap justify-center gap-2">
+            {l.handles.venmo && (
+              <PayNowButton onClick={() => onPayNow("venmo")} primary>
+                Pay ${num} in Venmo <ArrowUpRight className="h-4 w-4" />
+              </PayNowButton>
+            )}
+            {l.handles.cashapp && (
+              <PayNowButton onClick={() => onPayNow("cashapp")}>Cash App</PayNowButton>
+            )}
+            {l.handles.paypal && (
+              <PayNowButton onClick={() => onPayNow("paypal")}>PayPal</PayNowButton>
+            )}
+          </div>
+          <p className="text-center text-[11.5px] text-ink-soft">
+            Ripe doesn&rsquo;t touch the money — it goes straight to {l.grower}.
+          </p>
         </div>
-        <p className="text-center text-[11.5px] text-ink-soft">
-          Ripe never touches the money — it goes straight to {l.grower}.
-        </p>
-      </div>
+      )}
     </div>
   );
 }
@@ -529,10 +541,10 @@ function WaitStep({
         tabIndex={-1}
         className="font-display text-[20px] font-medium tracking-tight text-ink outline-none"
       >
-        Opening your wallet…
+        Pay {l.grower} directly
       </h2>
       <p className="text-[13.5px] text-ink-soft">
-        Finish paying {l.grower} ${num}, then pop back here.
+        Finish in your wallet app, then come back to wrap up.
       </p>
 
       {showQR && web ? (
@@ -568,7 +580,6 @@ function ReceiptStep({
   headingRef,
   num,
   paidVia,
-  neighborsFed,
   reduce,
   onDone,
 }: {
@@ -576,10 +587,17 @@ function ReceiptStep({
   headingRef: React.RefObject<HTMLHeadingElement | null>;
   num: number;
   paidVia: "pickup" | "venmo" | "cashapp" | "paypal";
-  neighborsFed: number;
   reduce: boolean;
   onDone: () => void;
 }) {
+  function share() {
+    const text = `My block just turned ${l.weightLbs} lb of surplus into a meal — straight from a neighbor on Ripe. ripe-psi.vercel.app`;
+    if (typeof navigator !== "undefined" && navigator.share) {
+      navigator.share({ text }).catch(() => {});
+    } else {
+      navigator.clipboard?.writeText(text).catch(() => {});
+    }
+  }
   return (
     <div className="relative flex flex-col items-center gap-4 py-2 text-center">
       {!reduce && <LeafConfetti />}
@@ -597,26 +615,29 @@ function ReceiptStep({
 
       <div className="grid w-full grid-cols-3 gap-2">
         <Stat value={<CountUp to={l.weightLbs} reduce={reduce} suffix=" lb" />} label="saved" />
-        <Stat value={<CountUp to={neighborsFed} reduce={reduce} />} label="neighbors fed" />
-        <Stat value="$0" label="platform cut" />
+        <Stat value={num > 0 ? `$${num}` : "Free"} label={num > 0 ? "to the grower" : "shared"} />
+        <Stat value="$0" label="to Ripe" />
       </div>
 
       <p className="text-[13.5px] text-ink-soft">
         {num > 0 ? (
           <>
             {paidVia === "pickup" ? "You'll hand" : "You paid"} {l.grower} ${num} —{" "}
-            <span className="font-semibold text-ink">100% of it.</span> Ripe took $0.
+            <span className="font-semibold text-terracotta">every cent.</span>
           </>
         ) : (
           <>
-            {l.grower} gifted this one free. Surplus that would&rsquo;ve rotted, on a
-            plate instead.
+            {l.grower} shared this one free — surplus that would&rsquo;ve gone to
+            waste, on a plate instead.
           </>
         )}
       </p>
 
       <div className="flex w-full flex-col gap-2 pt-1">
-        <button className="min-h-[52px] rounded-[13px] border border-line bg-card text-[14.5px] font-semibold text-ink transition-transform duration-150 hover:-translate-y-px">
+        <button
+          onClick={share}
+          className="min-h-[52px] rounded-[13px] border border-line bg-card text-[14.5px] font-semibold text-ink transition-transform duration-150 hover:-translate-y-px"
+        >
           Share this
         </button>
         <button

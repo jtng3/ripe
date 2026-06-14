@@ -82,7 +82,9 @@ export function Feed({
                   />
                 )}
                 <span className="text-xs">
-                  · {l.handoffs} {isProduce ? "handoffs" : "connections"} · ★ {l.rating.toFixed(1)}
+                  {l.handoffs === 0
+                    ? "· New neighbor"
+                    : `· ${l.handoffs} ${isProduce ? "handoffs" : "connections"} · ★ ${l.rating.toFixed(1)}`}
                 </span>
               </div>
 

@@ -67,9 +67,9 @@ export function ShareSheet({
       image: photo!,
       available: 1,
       weightLbs: 3,
-      rating: 5.0,
+      rating: 0,
       handoffs: 0,
-      verified: true,
+      verified: false,
       memberSince: "today",
       review: "Fresh from my garden.",
       handles: venmo.trim() ? { venmo: venmo.trim() } : {},
@@ -135,6 +135,7 @@ export function ShareSheet({
           <button
             type="button"
             onClick={() => fileRef.current?.click()}
+            aria-label="Add a photo of your produce"
             className="relative mt-4 flex h-[180px] w-full items-center justify-center overflow-hidden rounded-[16px] border border-dashed border-line bg-bone-2 text-ink-soft"
           >
             {photo ? (
@@ -153,7 +154,8 @@ export function ShareSheet({
             capture="environment"
             onChange={pickPhoto}
             className="sr-only"
-            aria-label="Add a photo of your produce"
+            tabIndex={-1}
+            aria-hidden="true"
           />
 
           {/* title */}
@@ -248,7 +250,7 @@ export function ShareSheet({
               />
             </div>
             <span className="text-[11.5px] text-ink-soft">
-              Ripe never touches it — neighbors pay you straight in your wallet.
+              Neighbors pay you straight in Venmo — Ripe doesn&rsquo;t touch it.
             </span>
           </label>
 
@@ -260,6 +262,11 @@ export function ShareSheet({
           >
             <Check className="h-5 w-5" aria-hidden /> Share with your block
           </button>
+          {!canPost && (
+            <p className="mt-2 text-center text-[12px] text-ink-soft">
+              {!photo ? "Add a photo to share." : "Give it a name to share."}
+            </p>
+          )}
         </div>
       </motion.div>
     </div>
