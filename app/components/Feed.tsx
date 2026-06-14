@@ -28,6 +28,7 @@ export function Feed({
                 fill
                 sizes="(max-width: 440px) 100vw, 440px"
                 className="object-cover"
+                unoptimized={l.image.startsWith("blob:") || l.image.startsWith("data:")}
               />
               <span className="absolute left-3 top-3 rounded-md bg-bone/90 px-2.5 py-1 text-[11px] font-bold text-ink backdrop-blur-sm">
                 {soldOut ? "All claimed" : `${l.available} left`}

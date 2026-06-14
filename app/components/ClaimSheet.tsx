@@ -235,7 +235,14 @@ function DetailStep({
   return (
     <div className="flex flex-col gap-4">
       <div className="relative h-[180px] overflow-hidden rounded-[16px] bg-bone-2">
-        <Image src={l.image} alt={l.title} fill sizes="440px" className="object-cover" />
+        <Image
+          src={l.image}
+          alt={l.title}
+          fill
+          sizes="440px"
+          className="object-cover"
+          unoptimized={l.image.startsWith("blob:") || l.image.startsWith("data:")}
+        />
         <span className="absolute bottom-2.5 left-2.5 rounded-md bg-bone/90 px-2.5 py-1 text-[11px] font-semibold text-ink backdrop-blur-sm">
           {l.pickupLabel} · {l.distance}
         </span>
