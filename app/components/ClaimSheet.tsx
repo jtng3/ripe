@@ -261,7 +261,7 @@ function DetailStep({
 
       <div className="flex items-center gap-2 rounded-[12px] bg-sage/60 px-3 py-2.5 text-[12.5px] text-green-deep">
         <Lock className="h-4 w-4 shrink-0" aria-hidden />
-        Exact pickup spot unlocks after a quick verify — {l.grower}&rsquo;s home stays private until then.
+        Exact pickup spot unlocks after a quick verify.
       </div>
 
       <div className="flex items-center justify-between pt-1">
@@ -325,8 +325,10 @@ function VerifyStep({
         </h2>
       </div>
       <p className="text-[13.5px] text-ink-soft">
-        One tap keeps Ripe neighbors-only. {grower} verified too — you&rsquo;ll both
-        know you&rsquo;re real neighbors. We never share your number or post.
+        Ripe is neighbors-only. Confirming a real number keeps out throwaway
+        accounts and ties every claim to your ratings — so neighbors stay
+        accountable. {grower} confirmed theirs, too. We never share your number,
+        and never post for you.
       </p>
 
       {!codeSent ? (
@@ -424,7 +426,7 @@ function PayStep({
           {l.exactPickup}
         </h2>
         <p className="mt-1 text-[12px] text-ink-soft">
-          You&rsquo;re both verified neighbors. {l.grower} has been notified.
+          You both confirmed a real number. {l.grower} has been notified.
         </p>
       </motion.div>
 
