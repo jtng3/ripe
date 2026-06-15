@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { motion, useReducedMotion } from "motion/react";
 import { QRCodeSVG } from "qrcode.react";
-import { BadgeCheck, X, ShieldCheck, MapPin, Lock, ArrowUpRight } from "lucide-react";
+import { BadgeCheck, X, ShieldCheck, MapPin, Lock, ArrowUpRight, Warehouse } from "lucide-react";
 import type { Listing } from "../lib/listings";
 import {
   venmoDeepLink,
@@ -270,6 +270,13 @@ function DetailStep({
         <Lock className="h-4 w-4 shrink-0" aria-hidden />
         Exact pickup spot unlocks after a quick verify.
       </div>
+
+      {l.pickupKind === "hub" && (
+        <div className="flex items-center gap-2 rounded-[12px] bg-bone-2/70 px-3 py-2.5 text-[12.5px] text-ink-soft">
+          <Warehouse className="h-4 w-4 shrink-0 text-green" aria-hidden />
+          A hub is a shared spot neighbors keep stocked, so you can grab this whenever it&rsquo;s open.
+        </div>
+      )}
 
       <div className="flex items-center justify-between pt-1">
         <div>

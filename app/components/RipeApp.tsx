@@ -6,6 +6,7 @@ import { Feed } from "./Feed";
 import { ClaimSheet } from "./ClaimSheet";
 import { ShareSheet } from "./ShareSheet";
 import { ContactSheet } from "./ContactSheet";
+import { HubSheet } from "./HubSheet";
 import { BLOCK_TOTAL, type Listing, type ListingType } from "../lib/listings";
 
 const FILTERS: { key: "all" | ListingType; label: string }[] = [
@@ -31,6 +32,7 @@ export function RipeApp({ listings }: { listings: Listing[] }) {
   const [claiming, setClaiming] = useState<Listing | null>(null);
   const [contacting, setContacting] = useState<Listing | null>(null);
   const [sharing, setSharing] = useState(false);
+  const [hubInfo, setHubInfo] = useState(false);
   const [verified, setVerified] = useState(false);
 
   // Claiming holds the produce for 1 hour — decrements availability, no payment.
@@ -50,7 +52,7 @@ export function RipeApp({ listings }: { listings: Listing[] }) {
   }
 
   const shown = filter === "all" ? items : items.filter((l) => l.type === filter);
-  const sheetOpen = Boolean(claiming) || Boolean(contacting) || sharing;
+  const sheetOpen = Boolean(claiming) || Boolean(contacting) || sharing || hubInfo;
   const moneyView = filter === "all" || filter === "produce";
 
   return (
@@ -102,7 +104,12 @@ export function RipeApp({ listings }: { listings: Listing[] }) {
           </span>
         </div>
 
-        <Feed items={shown} onClaim={setClaiming} onContact={setContacting} />
+        <Feed
+          items={shown}
+          onClaim={setClaiming}
+          onContact={setContacting}
+          onHubInfo={() => setHubInfo(true)}
+        />
 
         <div className="fixed inset-x-0 bottom-0 z-10 mx-auto max-w-[440px] bg-gradient-to-t from-bone from-40% to-transparent px-[18px] pb-6 pt-6">
           <button
@@ -133,6 +140,7 @@ export function RipeApp({ listings }: { listings: Listing[] }) {
           />
         )}
         {sharing && <ShareSheet onPost={addListing} onClose={() => setSharing(false)} />}
+        {hubInfo && <HubSheet onClose={() => setHubInfo(false)} />}
       </AnimatePresence>
     </div>
   );

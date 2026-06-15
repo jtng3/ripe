@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { BadgeCheck } from "lucide-react";
+import { BadgeCheck, Info } from "lucide-react";
 import type { Listing } from "../lib/listings";
 import { META } from "./listingMeta";
 
@@ -9,10 +9,12 @@ export function Feed({
   items,
   onClaim,
   onContact,
+  onHubInfo,
 }: {
   items: Listing[];
   onClaim: (l: Listing) => void;
   onContact: (l: Listing) => void;
+  onHubInfo: () => void;
 }) {
   if (items.length === 0) {
     return (
@@ -29,13 +31,14 @@ export function Feed({
         const isProduce = l.type === "produce";
         const soldOut = isProduce && l.available <= 0;
         const { Icon, label } = META[l.type];
+        const hasPhoto = l.image !== "";
         return (
           <article
             key={l.id}
             style={{ animationDelay: `${i * 0.07}s` }}
             className="rise-in overflow-hidden rounded-[18px] border border-line bg-card shadow-[0_4px_14px_-10px_rgba(35,39,31,0.35)]"
           >
-            {isProduce ? (
+            {hasPhoto ? (
               <div className="relative h-[248px] bg-bone-2">
                 <Image
                   src={l.image}
@@ -45,15 +48,29 @@ export function Feed({
                   className="object-cover"
                   unoptimized={l.image.startsWith("blob:") || l.image.startsWith("data:")}
                 />
-                <span className="absolute left-3 top-3 rounded-md bg-bone/90 px-2.5 py-1 text-[11px] font-bold text-ink backdrop-blur-sm">
-                  {soldOut ? "All claimed" : `${l.available} left`}
-                </span>
+                {isProduce && (
+                  <span className="absolute left-3 top-3 rounded-md bg-bone/90 px-2.5 py-1 text-[11px] font-bold text-ink backdrop-blur-sm">
+                    {soldOut ? "All claimed" : `${l.available} left`}
+                  </span>
+                )}
                 <span className="absolute right-3 top-3 rounded-md bg-black/55 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur-sm">
                   {l.distance}
                 </span>
-                <span className="absolute bottom-3 left-3 rounded-md bg-bone/90 px-2.5 py-1 text-[11px] font-semibold text-ink backdrop-blur-sm">
-                  {l.pickupLabel}
-                </span>
+                {l.pickupKind === "hub" ? (
+                  <button
+                    type="button"
+                    onClick={() => onHubInfo()}
+                    aria-label="What is a hub pickup?"
+                    className="absolute bottom-3 left-3 inline-flex items-center gap-1 rounded-md bg-bone/90 px-2.5 py-1 text-[11px] font-semibold text-ink backdrop-blur-sm transition-colors hover:bg-bone"
+                  >
+                    {l.pickupLabel}
+                    <Info className="h-3 w-3 text-green" aria-hidden />
+                  </button>
+                ) : (
+                  <span className="absolute bottom-3 left-3 rounded-md bg-bone/90 px-2.5 py-1 text-[11px] font-semibold text-ink backdrop-blur-sm">
+                    {l.pickupLabel}
+                  </span>
+                )}
               </div>
             ) : (
               <div className="relative flex h-[248px] flex-col items-center justify-center gap-3 bg-gradient-to-b from-sage to-bone-2">
