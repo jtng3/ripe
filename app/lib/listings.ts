@@ -1,5 +1,9 @@
 export type PickupKind = "porch" | "hub";
 
+// The grower's privacy dial: how far the listing is visible. Tighter is more
+// private and more local; wider trades some privacy for more potential claimers.
+export type Reach = "block" | "street" | "neighborhood";
+
 // Ripe shares more than the harvest: produce today, plus the land, tools,
 // and hands to grow it. Same map, same pin, same verify — different type.
 export type ListingType = "produce" | "land" | "tool" | "help";
@@ -14,6 +18,7 @@ export type Listing = {
   pickupKind: PickupKind;
   pickupLabel: string; // browse-safe label
   exactPickup: string; // revealed only after claim + verify
+  reach: Reach; // how far the listing is visible — the grower's privacy dial
   price: string; // display string (produce: "$3"; commons: "Free to borrow")
   suggestedAmount: number; // numeric default for pay / deep-link (0 = free)
   payNote: string;
@@ -35,6 +40,7 @@ export const BLOCK_TOTAL = 127;
 export const listings: Listing[] = [
   {
     id: "lemons",
+    reach: "street",
     type: "produce",
     grower: "Maya",
     initial: "M",
@@ -58,6 +64,7 @@ export const listings: Listing[] = [
   },
   {
     id: "peaches",
+    reach: "neighborhood",
     type: "produce",
     grower: "Marisol",
     initial: "M",
@@ -81,6 +88,7 @@ export const listings: Listing[] = [
   },
   {
     id: "zucchini",
+    reach: "neighborhood",
     type: "produce",
     grower: "Priya",
     initial: "P",
@@ -104,6 +112,7 @@ export const listings: Listing[] = [
   },
   {
     id: "grapes",
+    reach: "block",
     type: "produce",
     grower: "Sam",
     initial: "S",
@@ -127,6 +136,7 @@ export const listings: Listing[] = [
   },
   {
     id: "basil",
+    reach: "neighborhood",
     type: "produce",
     grower: "Lena",
     initial: "L",
@@ -153,6 +163,7 @@ export const listings: Listing[] = [
   // no payment (non-custodial, same verify gate as produce).
   {
     id: "plot-ruth",
+    reach: "neighborhood",
     type: "land",
     grower: "Ruth",
     initial: "R",
@@ -176,6 +187,7 @@ export const listings: Listing[] = [
   },
   {
     id: "tiller-marcus",
+    reach: "neighborhood",
     type: "tool",
     grower: "Marcus",
     initial: "M",
@@ -199,6 +211,7 @@ export const listings: Listing[] = [
   },
   {
     id: "cart-omar",
+    reach: "street",
     type: "tool",
     grower: "Omar",
     initial: "O",
@@ -222,6 +235,7 @@ export const listings: Listing[] = [
   },
   {
     id: "help-lourdes",
+    reach: "neighborhood",
     type: "help",
     grower: "Lourdes",
     initial: "L",

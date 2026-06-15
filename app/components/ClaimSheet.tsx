@@ -4,8 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { motion, useReducedMotion } from "motion/react";
 import { QRCodeSVG } from "qrcode.react";
-import { BadgeCheck, X, ShieldCheck, MapPin, Lock, ArrowUpRight, Warehouse } from "lucide-react";
+import { BadgeCheck, X, ShieldCheck, MapPin, Lock, ArrowUpRight, Warehouse, Radius } from "lucide-react";
 import type { Listing } from "../lib/listings";
+import { REACH } from "./listingMeta";
 import {
   venmoDeepLink,
   venmoWebLink,
@@ -277,6 +278,11 @@ function DetailStep({
           A hub is a shared spot neighbors keep stocked, so you can grab this whenever it&rsquo;s open.
         </div>
       )}
+
+      <div className="flex items-center gap-2 rounded-[12px] bg-bone-2/70 px-3 py-2.5 text-[12.5px] text-ink-soft">
+        <Radius className="h-4 w-4 shrink-0 text-green" aria-hidden />
+        Shared {REACH[l.reach].phrase}, {l.grower}&rsquo;s chosen reach.
+      </div>
 
       <div className="flex items-center justify-between pt-1">
         <div>

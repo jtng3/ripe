@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { motion, useReducedMotion } from "motion/react";
-import { X, Camera, MapPin, Check } from "lucide-react";
-import type { Listing, PickupKind } from "../lib/listings";
+import { X, Camera, MapPin, Check, Radius } from "lucide-react";
+import type { Listing, PickupKind, Reach } from "../lib/listings";
+import { REACH } from "./listingMeta";
 
 // Unique-enough ids for pins dropped during a session.
 let counter = 0;
@@ -21,6 +22,7 @@ export function ShareSheet({
   const [amount, setAmount] = useState("");
   const [free, setFree] = useState(false);
   const [pickup, setPickup] = useState<PickupKind>("porch");
+  const [reach, setReach] = useState<Reach>("neighborhood");
   const [venmo, setVenmo] = useState("");
 
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -56,6 +58,7 @@ export function ShareSheet({
       title: title.trim(),
       distance: "Just posted",
       pickupKind: pickup,
+      reach,
       pickupLabel: pickup === "porch" ? "Porch pickup" : "Hub · Elm St",
       exactPickup:
         pickup === "porch"
@@ -230,6 +233,36 @@ export function ShareSheet({
             </div>
             <p className="mt-1.5 text-[12px] text-ink-soft">
               Exact spot stays private until a verified neighbor claims it.
+            </p>
+          </div>
+
+          {/* reach — the grower's privacy dial: how far the listing is visible */}
+          <div className="mt-4">
+            <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-ink-soft">
+              Who can see it?
+            </span>
+            <div className="mt-1.5 grid grid-cols-3 gap-2">
+              {(["block", "street", "neighborhood"] as Reach[]).map((k) => (
+                <button
+                  key={k}
+                  type="button"
+                  onClick={() => setReach(k)}
+                  aria-pressed={reach === k}
+                  aria-label={REACH[k].pick}
+                  className={`flex min-h-[54px] flex-col items-center justify-center gap-0.5 rounded-[12px] border px-1 text-center transition-colors ${
+                    reach === k
+                      ? "border-green bg-sage/60 text-green-deep"
+                      : "border-line bg-card text-ink"
+                  }`}
+                >
+                  <span className="text-[12.5px] font-semibold leading-tight">{REACH[k].pick}</span>
+                  <span className="text-[10.5px] text-ink-soft">{REACH[k].dist}</span>
+                </button>
+              ))}
+            </div>
+            <p className="mt-1.5 flex items-center gap-1.5 text-[12px] text-ink-soft">
+              <Radius className="h-3.5 w-3.5 shrink-0 text-green" aria-hidden />
+              Your share only appears inside this ring. Start as local as you like.
             </p>
           </div>
 
