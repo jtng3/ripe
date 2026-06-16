@@ -131,7 +131,7 @@ export function ShareSheet({
             Share your surplus
           </h2>
           <p className="mt-1 text-[13px] text-ink-soft">
-            Whole, uncut produce from your garden — free or pay-what&rsquo;s-fair.
+            Whole, uncut produce from your garden. Free or pay-what&rsquo;s-fair.
           </p>
 
           {/* photo */}
@@ -283,7 +283,7 @@ export function ShareSheet({
               />
             </div>
             <span className="text-[11.5px] text-ink-soft">
-              Neighbors pay you straight in Venmo — Ripe doesn&rsquo;t touch it.
+              Neighbors pay you straight in Venmo. Ripe doesn&rsquo;t touch it.
             </span>
           </label>
 

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { motion, useReducedMotion } from "motion/react";
 import { QRCodeSVG } from "qrcode.react";
 import { BadgeCheck, X, ShieldCheck, MapPin, Lock, ArrowUpRight, Warehouse, Radius } from "lucide-react";
-import type { Listing } from "../lib/listings";
+import { BLOCK_TOTAL, type Listing } from "../lib/listings";
 import { REACH } from "./listingMeta";
 import {
   venmoDeepLink,
@@ -299,7 +299,7 @@ function DetailStep({
         </button>
       </div>
       <p className="text-center text-[12px] text-ink-soft">
-        Free to hold for an hour — no payment until pickup.
+        Free to hold for an hour. No payment until pickup.
       </p>
     </div>
   );
@@ -344,7 +344,7 @@ function VerifyStep({
         </h2>
       </div>
       <p className="text-[13.5px] text-ink-soft">
-        Ripe is neighbors-only — a real number keeps it that way. It&rsquo;s how
+        Ripe is neighbors-only. A real number keeps it that way. It&rsquo;s how
         you&rsquo;ll reach each other at the handoff, and it keeps everyone
         accountable. {grower} confirmed theirs, too. We don&rsquo;t share your
         number or sell your data.
@@ -447,7 +447,7 @@ function PayStep({
           {l.exactPickup}
         </h2>
         <p className="mt-1 text-[12px] text-ink-soft">
-          This claim is tied to your verified number and rating — no-shows hurt
+          This claim is tied to your verified number and rating. No-shows hurt
           your standing, so neighbors show up.
         </p>
       </motion.div>
@@ -477,7 +477,7 @@ function PayStep({
         </label>
         {l.suggestedAmount === 0 && (
           <p className="mt-1.5 text-[12px] text-ink-soft">
-            It&rsquo;s free — add a thank-you if you like.
+            It&rsquo;s free. Add a thank-you if you like.
           </p>
         )}
       </div>
@@ -520,7 +520,7 @@ function PayStep({
             )}
           </div>
           <p className="text-center text-[11.5px] text-ink-soft">
-            Ripe doesn&rsquo;t touch the money — it goes straight to {l.grower}.
+            Ripe doesn&rsquo;t touch the money. It goes straight to {l.grower}.
           </p>
         </div>
       )}
@@ -604,7 +604,7 @@ function ReceiptStep({
   onDone: () => void;
 }) {
   function share() {
-    const text = `My block just turned ${l.weightLbs} lb of surplus into a meal — straight from a neighbor on Ripe. ripe-psi.vercel.app`;
+    const text = `My block just turned ${l.weightLbs} lb of surplus into a meal, straight from a neighbor on Ripe. ripe-psi.vercel.app`;
     if (typeof navigator !== "undefined" && navigator.share) {
       navigator.share({ text }).catch(() => {});
     } else {
@@ -629,18 +629,18 @@ function ReceiptStep({
       <div className="grid w-full grid-cols-3 gap-2">
         <Stat value={<CountUp to={l.weightLbs} reduce={reduce} suffix=" lb" />} label="saved" />
         <Stat value={num > 0 ? `$${num}` : "Free"} label={num > 0 ? "to the grower" : "shared"} />
-        <Stat value="$0" label="to Ripe" />
+        <Stat value={`$${BLOCK_TOTAL}`} label="kept local" />
       </div>
 
       <p className="text-[13.5px] text-ink-soft">
         {num > 0 ? (
           <>
-            {paidVia === "pickup" ? "You'll hand" : "You paid"} {l.grower} ${num} —{" "}
-            <span className="font-semibold text-terracotta">every cent.</span>
+            {paidVia === "pickup" ? "You'll hand" : "You paid"} {l.grower} ${num} for
+            it. Whole produce, straight from their garden.
           </>
         ) : (
           <>
-            {l.grower} shared this one free — surplus that would&rsquo;ve gone to
+            {l.grower} shared this one free. Surplus that would&rsquo;ve gone to
             waste, on a plate instead.
           </>
         )}

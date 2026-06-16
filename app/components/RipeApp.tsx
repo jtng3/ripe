@@ -65,7 +65,7 @@ export function RipeApp({ listings }: { listings: Listing[] }) {
                 Ripe
               </span>
               <span className="mt-1 text-[11px] font-semibold text-ink-soft">
-                Money goes straight to the grower
+                Backyard produce, shared with the neighborhood
               </span>
             </div>
             <span className="flex items-center gap-1.5 pt-1 text-[13px] font-semibold text-ink-soft">

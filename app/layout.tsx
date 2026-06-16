@@ -17,7 +17,7 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Ripe — the fruit on your street",
+  title: "Ripe · the fruit on your street",
   description:
     "A neighborhood map for sharing surplus garden produce. Pin what's ripe, claim what you need, pay the grower in one tap.",
 };
